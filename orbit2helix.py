@@ -12,9 +12,9 @@ class OrbitToHelix(ThreeDScene):
         time_tracker = ValueTracker(0)
 
         # 物理パラメータ
-        R = 2.0         # 2星間の距離（一定）
-        omega = 2 * PI  # 角速度（1単位時間で1周）
-        v_z = 0.6       # z軸方向（文脈）への推進スピード
+        R = 2.0          # 2星間の距離（一定）
+        omega = 0.8 * PI # 角速度（10秒で4回転 → 螺旋が視認しやすい密度）
+        v_z = 0.6        # z軸方向（文脈）への推進スピード
 
         # LLM星（最初は中心で重い・青）
         llm_star = Sphere(radius=0.3, color=BLUE).set_opacity(0.9)
@@ -55,6 +55,11 @@ class OrbitToHelix(ThreeDScene):
             z = v_z * t - 3
             mob.move_to(axes.c2p(x, y, z))
 
+        # [Fix] updater登録前に初期位置を明示的に設定
+        # （未設定のままだとTracedPathがORIGINから軌跡を引くバグを防ぐ）
+        update_llm(llm_star)
+        update_user(user_star)
+
         # アップデーターの紐付け
         llm_star.add_updater(update_llm)
         user_star.add_updater(update_user)
@@ -63,8 +68,18 @@ class OrbitToHelix(ThreeDScene):
         llm_trace = TracedPath(llm_star.get_center, stroke_color=BLUE, stroke_width=4)
         user_trace = TracedPath(user_star.get_center, stroke_color=ORANGE, stroke_width=4)
 
-        self.add(axes, llm_star, user_star, llm_trace, user_trace)
+        # 軸ラベル（z軸に「文脈」と表示）
+        labels = axes.get_axis_labels(
+            x_label="x", y_label="y", z_label=Text("文脈(z)", font_size=24)
+        )
+
+        self.add(axes, labels, llm_star, user_star, llm_trace, user_trace)
+
+        # カメラをゆっくり回転させてDouble Helixの3D構造を可視化
+        self.begin_ambient_camera_rotation(rate=0.3)
 
         # 10秒間かけて時間を進めるアニメーション
         self.play(time_tracker.animate.set_value(10), run_time=10, rate_func=linear)
+
+        self.stop_ambient_camera_rotation()
         self.wait(2)
