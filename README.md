@@ -17,9 +17,27 @@ This script visualizes this exact transition: from a static, asymmetric **Orbit*
 - **風雅 (Fūga - Japanese):** Elegance, refinement, and the artistic pursuit of poetry. A tribute to the poetic glitches and semantic depths found at the very edge of the LLM latent space.
 
 ## Requirements
-- Python 3.x
-- Manim Community Edition (`pip install manim`)
+
+### OS-Level Dependencies (Linux / Ubuntu / WSL)
+Manim requires several system libraries for video rendering, text generation, and LaTeX processing. Before installing the Python packages, you must install these native dependencies:
+
+```bash
+sudo apt update
+sudo apt install -y build-essential libcairo2-dev libpango1.0-dev ffmpeg pkg-config python3-dev
+sudo apt install -y texlive texlive-latex-extra texlive-fonts-extra dvisvgm
+```
+
+## Python Dependencies
+Python 3.x
+
+Manim Community Edition
+
+You can install the required Python packages inside your virtual environment:
+```Bash
+pip install manim
+```
 
 ## Usage
-```bash
+```Bash
 manim -pqh orbit_helix.py OrbitToHelix
+```
